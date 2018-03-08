@@ -1,12 +1,35 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
  
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>br.com.devmedia.curso</groupId>
-  <artifactId>intro-spring-mvc</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>war</packaging>
-  
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>br.com.devmedia.curso</groupId>
+	<artifactId>intro-spring-mvc</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	
+	<!-- Inherit defaults from Spring Boot -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.0.RELEASE</version>
+	</parent>
+
+		
   	<dependencies>
+	  	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<version>2.0.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+        	<groupId>org.apache.tomcat.embed</groupId>
+        	<artifactId>tomcat-embed-jasper</artifactId>
+        	<scope>provided</scope>
+    	</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -41,24 +64,24 @@
 	</dependencies>
 	<build>
 		<finalName>intro-spring-mvc</finalName>
+		<resources>
+            <resource>
+                <directory>${project.basedir}/src/main/webapp</directory>
+            </resource>
+			<resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+		</resources>
+		<!-- Package as an executable jar -->
 		<plugins>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<port>9090</port>
-					<path>/${project.build.finalName}</path>
-				</configuration>
+					<mainClass>mx.com.springmvc.capacitacion.main.Application</mainClass>
+					<layout>WAR</layout>					      
+        			<addResources>true</addResources>      
+				</configuration>				
 			</plugin>
 		</plugins>
 	</build>
