@@ -1,65 +1,101 @@
 package mx.com.springmvc.capacitacion.dao;
 
-import java.time.LocalDate;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import mx.com.springmvc.capacitacion.domain.TipoSexo;
 import mx.com.springmvc.capacitacion.domain.Usuario;
 
 @Repository
+@Transactional // faz com que todos os metodos da classe estejam anotados com essa anotacao
 public class UsuarioDaoImpl implements UsuarioDao {
 
-	private static List<Usuario> us;
-
-	public UsuarioDaoImpl() {
-		createUserList();
-	}
-
-	private List<Usuario> createUserList() {
-		if (us == null) {
-			us = new LinkedList<>();
-			us.add(new Usuario(System.currentTimeMillis() + 1L, "Ana", "da Silva", LocalDate.of(1978, 12, 03), TipoSexo.MUJER));
-			us.add(new Usuario(System.currentTimeMillis() + 2L, "Luiz", "dos Santos", LocalDate.of(1971, 10, 23), TipoSexo.HOMBRE));
-			us.add(new Usuario(System.currentTimeMillis() + 3L, "Mariana", "Mello", LocalDate.of(1990, 01, 01), TipoSexo.MUJER));
-			us.add(new Usuario(System.currentTimeMillis() + 4L, "Caren", "Pereira"));
-			us.add(new Usuario(System.currentTimeMillis() + 5L, "Sonia", "Fagundes"));
-			us.add(new Usuario(System.currentTimeMillis() + 6L, "Norberto", "de Souza"));
-		}
-		return us;
-	}
+	// da acesso aos metodos da JPA
+	@PersistenceContext // obtem um objeto entity manager da nossa fabrica de objetos EntityManeger
+						// criado na SpringJPAConfig.entityManagerFactory
+	private EntityManager entityManager;
 
 	@Override
 	public void salvar(Usuario usuario) {
-		usuario.setId(System.currentTimeMillis());
-		us.add(usuario);
+
+		// se nao tivessemos a anotacao transaction no topo da classe, teriamos que
+		// realizar essa operacao comente com a JPA da seguinte maneira
+		/*
+		 * this.entityManager.getTransaction().begin();
+		 * this.entityManager.persist(usuario);
+		 * this.entityManager.getTransaction().commit(); this.entityManager.close();
+		 */
+
+		// como temos a anotacao transaction no topo da classe, o Spring encapsula toda
+		// essa logica que esta acima demonstrada e com isso podemoa apenas fazer o
+		// seguinte
+		this.entityManager.persist(usuario);
 	}
 
+	@Transactional
 	@Override
 	public void editar(Usuario usuario) {
-		us.stream().filter((u) -> u.getId().equals(usuario.getId())).forEach((u) -> {
-			u.setNome(usuario.getNome());
-			u.setSobrenome(usuario.getSobrenome());
-			u.setDtNascimento(usuario.getDtNascimento());
-			u.setSexo(usuario.getSexo());
-		});
+
+		this.entityManager.merge(usuario);
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> getBySexo(TipoSexo sexo) {
+
+		String jpql = "from Usuario u where u.sexo = :sexo";
+		TypedQuery<Usuario> query = this.entityManager.createQuery(jpql, Usuario.class);
+		query.setParameter("sexo", sexo);
+
+		return query.getResultList();
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> getByNome(String nome) {
+		
+		String jpql = "from Usuario u where u.nome like :nome or u.sobrenome like :sobrenome";
+		TypedQuery<Usuario> query = entityManager.createQuery(jpql, Usuario.class);
+		query.setParameter("nome", "%" + nome + "%");
+		query.setParameter("sobrenome", "%" + nome + "%");
+		
+		return query.getResultList();
+	}
+
+	@Transactional
 	@Override
 	public void excluir(Long id) {
-		us.removeIf((u) -> u.getId().equals(id));
+
+		this.entityManager.remove(entityManager.getReference(Usuario.class, id));
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public Usuario getId(Long id) {
-		return us.stream().filter((u) -> u.getId().equals(id)).collect(Collectors.toList()).get(0);
+
+		String jpql = "from Usuario u where u.id = :id"; // se usa parametro nomeado, no caso id
+		TypedQuery<Usuario> query = this.entityManager.createQuery(jpql, Usuario.class);
+		query.setParameter("id", id); // seta o parametro que preenche o parametro nomeado id
+
+		return query.getSingleResult();
 	}
 
+	@Transactional(readOnly = true) // informa ao gerenciamento de transacoes do spring que esse eh um metodo
+									// somente de leitura, o seu valor default eh false
 	@Override
 	public List<Usuario> getTodos() {
-		return us;
+
+		String jpql = "from Usuario u"; // eh o mesmo que um select * from Usuario
+		TypedQuery<Usuario> query = this.entityManager.createQuery(jpql, Usuario.class); // classe interna da JPA para
+																							// lidar com queries
+
+		return query.getResultList(); // retorna um java.util.List com todos os Usuarios da tablea Usuario
 	}
+
 }

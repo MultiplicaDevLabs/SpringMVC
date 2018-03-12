@@ -2,6 +2,7 @@ package mx.com.springmvc.capacitacion.config;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+//essa classe substitui o arquivo web.xml, aqui se faz as configuracoes que estariam no web.xml
 public class SpringInitConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
 
 	@Override
