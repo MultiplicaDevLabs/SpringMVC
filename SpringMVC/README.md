@@ -7,6 +7,7 @@ This is Spring MVC boilerplate used by Multiplica Mexico.
 * Spring Core
 * Spring MVC
 * Spring Boot
+* Sprint ORM
 * Maven
 * Docker(Optional)
 
@@ -32,12 +33,6 @@ Docker allow us to isolate the dev environment
 
 ````shell
 make build
-````
-
-## Run Docker in production mode
-
-````shell
-make run-production
 ````
 
 ## Run Docker in development mode

@@ -13,9 +13,5 @@ build:
 run-maven: clean
 	mvn spring-boot:run
 
-run-production: build
-	# Run docker container
-	docker-compose up app
-
 run-develop: 
 	docker-compose up dev

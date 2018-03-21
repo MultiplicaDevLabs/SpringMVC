@@ -11,12 +11,20 @@ services:
     command:       
       - '/bin/bash'
       - '-c'
-      - '(cd /usr/src/app && mvn spring-boot:run)'            
+      - '(cd /usr/src/app && mvn spring-boot:run)'
+    environment:
+      - MYSQL_USERNAME=root
+      - MYSQL_HOST=mariadb
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=test          
+    links:
+      - mariadb
 
   builder:    
     image: maven:3.5.2-jdk-8-alpine    
     volumes:
-      - ".:/usr/src/app/"        
+      - ".:/usr/src/app/"    
+      # Cache maven dependencies     
       - "$HOME/.maven-docker/:/root/.m2/"
     command:
       - 'mvn'
@@ -27,4 +35,12 @@ services:
   app:
     build: .
     ports:
-     - "8080:8080"
+     - "8080:8080"    
+
+  mariadb:
+    image: mariadb:10.3.5
+    ports:  
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password    
+      - MYSQL_DATABASE=test
