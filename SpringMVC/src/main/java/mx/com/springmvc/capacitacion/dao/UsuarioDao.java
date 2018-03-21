@@ -2,6 +2,7 @@ package mx.com.springmvc.capacitacion.dao;
 
 import java.util.List;
 
+import mx.com.springmvc.capacitacion.domain.TipoSexo;
 import mx.com.springmvc.capacitacion.domain.Usuario;
 
 public interface UsuarioDao {
@@ -14,5 +15,9 @@ public interface UsuarioDao {
 	
 	Usuario getId(Long id);
 	
-	List<Usuario> getTodos(); 
+	List<Usuario> getTodos();
+
+	List<Usuario> getBySexo(TipoSexo sexo);
+
+	List<Usuario> getByNome(String nome); 
 }
