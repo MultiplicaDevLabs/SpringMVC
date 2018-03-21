@@ -28,9 +28,13 @@ public class SpringJPAConfig {
 
 		DriverManagerDataSource ds = new DriverManagerDataSource();
 		ds.setDriverClassName("com.mysql.jdbc.Driver");
-		ds.setUrl("jdbc:mysql://localhost:3306/test");
-		ds.setUsername("root");
-		ds.setPassword("root");
+		String host = System.getenv("MYSQL_HOST");
+		String database = System.getenv("MYSQL_DATABASE");
+		String username = System.getenv("MYSQL_USERNAME");
+		String password = System.getenv("MYSQL_PASSWORD");
+		ds.setUrl("jdbc:mysql://"+host+":3306/"+database);
+		ds.setUsername(username);
+		ds.setPassword(password);
 
 		return ds;
 	}
@@ -64,7 +68,7 @@ public class SpringJPAConfig {
 		props.setProperty("hibernate.show_sql", "true");
 		props.setProperty("hibernate.format_sql", "true");
 		props.setProperty("hibernate.hbm2ddl.auto", "update"); //cria ou modifica uma entidade na BD
-		
+		props.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
 		return props;
 	}
 }
